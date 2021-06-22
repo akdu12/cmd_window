@@ -1,6 +1,6 @@
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(MyApp());
@@ -54,7 +54,27 @@ class _DraggableArea extends State<DraggableArea> {
   }
 }
 
-class CMDWindow extends StatelessWidget {
+class CMDWindow extends StatefulWidget {
+  @override
+  State createState() => _CMDWindowState();
+}
+
+class _CMDWindowState extends State<CMDWindow> {
+  final controller = TextEditingController(text: "Cmd-Window-Pro:~ User \$");
+
+  @override
+  void initState() {
+    super.initState();
+    controller.addListener(() {
+      if (controller.selection.extentOffset <
+          "Cmd-Window-Pro:~ User \$".length) {
+        controller
+          ..selection = controller.selection
+              .copyWith(extentOffset: "Cmd-Window-Pro:~ User \$".length);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -107,37 +127,45 @@ class CMDWindow extends StatelessWidget {
                   ],
                 ),
                 Expanded(
-                    child: Text(
-                  "roblef -- bash  -- 80x24",
-                  textAlign: TextAlign.center,
-                )),
+                    child: Text("roblef ―― bash ―― 80x24",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.sourceCodePro(
+                            color: Colors.black54,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            letterSpacing: -0.5,
+                            height: 1))),
                 Icon(Icons.exit_to_app)
               ],
             ),
           ),
           Expanded(
               child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             color: Colors.black,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("Last login : Tue Jan 28 10:00:35 on console\n",
-                    style: TextStyle(color: const Color(0xff3aa832))),
+                    style: GoogleFonts.sourceCodePro(
+                        color: const Color(0xff3aa832),
+                        letterSpacing: -0.5,
+                        height: 1)),
                 Flexible(
                   child: Container(
                     child: TextField(
-                      controller: TextEditingController(
-                          text: "Cmd-Window-Pro:~ User \$"),
+                      controller: controller,
                       inputFormatters: [
                         ForcePrefixInputFormatter(
                             prefix: "Cmd-Window-Pro:~ User \$ ")
                       ],
                       autofocus: true,
                       maxLines: 100,
-                      style: TextStyle(
+                      style: GoogleFonts.sourceCodePro(
                           color: const Color(0xff3aa832),
-                          height: 1,
-                          letterSpacing: 0.5),
+                          letterSpacing: -0.5,
+                          fontSize: 14,
+                          height: 1),
                       cursorColor: const Color(0xff3aa832),
                       cursorHeight: 20,
                       cursorWidth: 7,
