@@ -1,5 +1,6 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(MyApp());
@@ -125,17 +126,27 @@ class CMDWindow extends StatelessWidget {
                 Flexible(
                   child: Container(
                     child: TextField(
+                      controller: TextEditingController(
+                          text: "Cmd-Window-Pro:~ User \$"),
+                      inputFormatters: [
+                        ForcePrefixInputFormatter(
+                            prefix: "Cmd-Window-Pro:~ User \$ ")
+                      ],
                       autofocus: true,
                       maxLines: 100,
-                      style:  TextStyle(color: const Color(0xff3aa832),height: 1),
+                      style: TextStyle(
+                          color: const Color(0xff3aa832),
+                          height: 1,
+                          letterSpacing: 0.5),
+                      cursorColor: const Color(0xff3aa832),
+                      cursorHeight: 20,
+                      cursorWidth: 7,
                       decoration: InputDecoration(
                         isDense: true,
                         contentPadding: EdgeInsets.zero,
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         disabledBorder: InputBorder.none,
-                        prefix: Text("Cmd-Window-Pro:~ User \$",
-                            style: TextStyle(color: const Color(0xff3aa832),height: 1)),
                       ),
                     ),
                   ),
@@ -145,6 +156,25 @@ class CMDWindow extends StatelessWidget {
           )),
         ],
       ),
+    );
+  }
+}
+
+class ForcePrefixInputFormatter extends TextInputFormatter {
+  final String prefix;
+
+  ForcePrefixInputFormatter({this.prefix = ""});
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final String text =
+        newValue.text.startsWith(prefix) ? newValue.text : prefix;
+    return newValue.copyWith(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
     );
   }
 }
