@@ -15,18 +15,43 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: DraggableArea(),
+      home: CMDWindowManager(
+        child: Scaffold(),
+      ),
     );
   }
 }
 
-class DraggableArea extends StatefulWidget {
+class CMDWindowManager extends StatefulWidget {
+  final Widget child;
+
+  CMDWindowManager({required this.child});
+
   @override
-  State createState() => _DraggableArea();
+  State createState() => _CMDWindowManagerState();
+
+  static _CMDWindowManagerState? of(BuildContext context) {
+    final cmdWindowMangerState =
+        context.findAncestorStateOfType<_CMDWindowManagerState>();
+    assert(() {
+      if (cmdWindowMangerState == null) {
+        throw FlutterError(
+            'CMDWindowManager operation requested with a context that does not include a CMDWindowManager.\n'
+            'The context used to show CMDWindowManager must be that of a widget '
+            'that is a descendant of a CMDWindowManager widget.');
+      }
+      return true;
+    }());
+    return cmdWindowMangerState;
+  }
 }
 
-class _DraggableArea extends State<DraggableArea> {
-  Offset _currentOffset = Offset.zero;
+class _CMDWindowManagerState extends State<CMDWindowManager> {
+  Map<Widget, Offset> windows = {
+    CMDWindow(): Offset.zero,
+    CMDWindow(): Offset.zero
+  };
+  String prefix = "";
 
   @override
   Widget build(BuildContext context) {
@@ -34,20 +59,24 @@ class _DraggableArea extends State<DraggableArea> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Positioned(
-            left: _currentOffset.dx,
-            top: _currentOffset.dy,
-            child: Draggable(
-              onDragEnd: (details) {
-                setState(() {
-                  _currentOffset = details.offset;
-                });
-              },
-              child: CMDWindow(),
-              feedback: Material(child: CMDWindow()),
-              childWhenDragging: Container(),
-            ),
-          ),
+          widget.child,
+          ...windows.keys
+              .map((e) => Positioned(
+                    left: windows[e]!.dx,
+                    top: windows[e]!.dy,
+                    child: Draggable(
+                      onDragEnd: (details) {
+                        setState(() {
+                          windows.remove(e);
+                          windows[e] = details.offset;
+                        });
+                      },
+                      child: e,
+                      feedback: Material(child: e),
+                      childWhenDragging: SizedBox.shrink(),
+                    ),
+                  ))
+              .toList()
         ],
       ),
     );
@@ -78,15 +107,15 @@ class _CMDWindowState extends State<CMDWindow> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 750,
-      height: 500,
+      width: 650,
+      height: 450,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-                color: Colors.grey.withOpacity(0.7),
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 15,
                 offset: Offset(0, 15),
                 spreadRadius: 10)
@@ -94,7 +123,7 @@ class _CMDWindowState extends State<CMDWindow> {
       child: Column(
         children: [
           Container(
-            constraints: BoxConstraints.expand(height: 28),
+            constraints: BoxConstraints.expand(height: 25),
             padding: EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -109,20 +138,20 @@ class _CMDWindowState extends State<CMDWindow> {
                     Container(
                         decoration: BoxDecoration(
                             color: Colors.red, shape: BoxShape.circle),
-                        width: 15,
-                        height: 15),
+                        width: 12,
+                        height: 12),
                     const SizedBox(width: 10),
                     Container(
                         decoration: BoxDecoration(
                             color: Colors.yellow, shape: BoxShape.circle),
-                        width: 15,
-                        height: 15),
+                        width: 12,
+                        height: 12),
                     const SizedBox(width: 10),
                     Container(
                         decoration: BoxDecoration(
                             color: Colors.greenAccent, shape: BoxShape.circle),
-                        width: 15,
-                        height: 15),
+                        width: 12,
+                        height: 12),
                     const SizedBox(width: 10),
                   ],
                 ),
@@ -132,7 +161,7 @@ class _CMDWindowState extends State<CMDWindow> {
                         style: GoogleFonts.sourceCodePro(
                             color: Colors.black54,
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 14,
                             letterSpacing: -0.5,
                             height: 1))),
                 Icon(Icons.exit_to_app)
@@ -149,6 +178,7 @@ class _CMDWindowState extends State<CMDWindow> {
                 Text("Last login : Tue Jan 28 10:00:35 on console\n",
                     style: GoogleFonts.sourceCodePro(
                         color: const Color(0xff3aa832),
+                        fontSize: 12,
                         letterSpacing: -0.5,
                         height: 1)),
                 Flexible(
@@ -160,11 +190,11 @@ class _CMDWindowState extends State<CMDWindow> {
                             prefix: "Cmd-Window-Pro:~ User \$ ")
                       ],
                       autofocus: true,
-                      maxLines: 100,
+                      maxLines: null,
                       style: GoogleFonts.sourceCodePro(
                           color: const Color(0xff3aa832),
                           letterSpacing: -0.5,
-                          fontSize: 14,
+                          fontSize: 12,
                           height: 1),
                       cursorColor: const Color(0xff3aa832),
                       cursorHeight: 20,
